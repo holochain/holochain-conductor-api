@@ -12,6 +12,11 @@ import { WsClient } from './client'
 import { catchError } from './common'
 import { Transformer, requesterTransformer, Requester } from '../api/common'
 
+const API_TAGS ={
+  APP_INFO: 'app_info',
+  CALL_ZOME: 'zome_call_invocation'
+}
+
 export class AppWebsocket implements AppApi {
   client: WsClient
 
@@ -27,7 +32,7 @@ export class AppWebsocket implements AppApi {
     return new AppWebsocket(wsClient)
   }
 
-  private _requester = <ReqO, ReqI, ResI, ResO>(
+  private _createRequester = <ReqO, ReqI, ResI, ResO>(
     tag: string,
     transformer?: Transformer<ReqO, ReqI, ResI, ResO>
   ): Requester<ReqO, ResO> =>
@@ -38,24 +43,24 @@ export class AppWebsocket implements AppApi {
     )
 
   appInfo = (req: AppInfoRequest): Promise<AppInfoResponse> => {
-    return this._requester<
+    return this._createRequester<
       AppInfoRequest,
       AppInfoRequest,
       AppInfoResponse,
       AppInfoResponse
-    >('app_info')(req)
+    >(API_TAGS.APP_INFO)(req)
   }
 
   callZome = (
     req: CallZomeRequestGeneric<any>
   ): Promise<CallZomeResponseGeneric<any>> => {
-    return this._requester<
+    return this._createRequester<
       CallZomeRequestGeneric<any>,
       CallZomeRequestGeneric<Buffer>,
       CallZomeResponseGeneric<Buffer>,
       CallZomeResponseGeneric<any>
     >(
-      'zome_call_invocation',
+      API_TAGS.CALL_ZOME,
       callZomeTransform
     )(req)
   }

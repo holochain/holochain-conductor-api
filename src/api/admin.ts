@@ -19,7 +19,12 @@ export type GenerateAgentPubKeyResponse = AgentPubKey
 export type InstallAppRequest = {
   app_id: AppId,
   agent_key: AgentPubKey,
-  dnas: Array<InstallAppDnaPayload>,
+  dnas: Array<{
+    path: string,
+    nick: CellNick,
+    properties?: DnaProperties,
+    membrane_proof?: MembraneProof
+  }>,
 }
 export type InstallAppResponse = InstalledApp
 
@@ -42,12 +47,4 @@ export interface AdminApi {
   listDnas: Requester<ListDnasRequest, ListDnasResponse>
   listCellIds: Requester<ListCellIdsRequest, ListCellIdsResponse>
   listActiveAppIds: Requester<ListActiveAppIdsRequest, ListActiveAppIdsResponse>
-}
-
-
-type InstallAppDnaPayload = {
-  path: string,
-  nick: CellNick,
-  properties?: DnaProperties,
-  membrane_proof?: MembraneProof
 }
