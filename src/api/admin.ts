@@ -4,7 +4,7 @@ import { AgentPubKey, MembraneProof, DnaProperties, AppId, CellId, CellNick, Ins
 export type ActivateAppRequest = { app_id: AppId }
 export type ActivateAppResponse = null
 
-export type AttachAppInterfaceRequest = { port: number }
+export type AttachAppInterfaceRequest = { port: number | null }
 export type AttachAppInterfaceResponse = { port: number }
 
 export type DeactivateAppRequest = { app_id: AppId }

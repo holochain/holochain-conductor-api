@@ -1,26 +1,29 @@
-/**
- * Defines AdminWebsocket, an easy-to-use websocket implementation of the
- * Conductor Admin API
- *
- *    const client = AdminWebsocket.connect(
- *      'ws://localhost:9000'
- *    )
- *
- *    client.generateAgentPubKey()
- *      .then(agentPubKey => {
- *        console.log('Agent successfully generated:', agentPubKey)
- *      })
- *      .catch(err => {
- *        console.error('problem generating agent:', err)
- *      })
- */
-
-import * as Api from '../api/admin'
+import {
+  AdminApi,
+  ActivateAppRequest,
+  ActivateAppResponse,
+  AttachAppInterfaceRequest,
+  AttachAppInterfaceResponse,
+  DeactivateAppRequest,
+  DeactivateAppResponse,
+  DumpStateRequest,
+  DumpStateResponse,
+  GenerateAgentPubKeyRequest,
+  GenerateAgentPubKeyResponse,
+  InstallAppRequest,
+  InstallAppResponse,
+  ListDnasRequest,
+  ListDnasResponse,
+  ListCellIdsRequest,
+  ListCellIdsResponse,
+  ListActiveAppIdsRequest,
+  ListActiveAppIdsResponse,
+} from '../api/admin'
 import { WsClient } from './client'
 import { catchError } from './common'
 import { Transformer, requesterTransformer, Requester } from '../api/common'
 
-export class AdminWebsocket implements Api.AdminApi {
+export class AdminWebsocket implements AdminApi {
   client: WsClient
 
   constructor(client: WsClient) {
@@ -32,39 +35,111 @@ export class AdminWebsocket implements Api.AdminApi {
     return new AdminWebsocket(wsClient)
   }
 
-  _requester = <ReqO, ReqI, ResI, ResO>(tag: string, transformer?: Transformer<ReqO, ReqI, ResI, ResO>) =>
+  private _requester = <ReqO, ReqI, ResI, ResO>(
+    tag: string,
+    transformer?: Transformer<ReqO, ReqI, ResI, ResO>
+  ): Requester<ReqO, ResO> =>
     requesterTransformer(
-      req => this.client.request(req).then(catchError),
+      (req) => this.client.request(req).then(catchError),
       tag,
       transformer
     )
 
   // the specific request/response types come from the Interface
   // which this class implements
-  activateApp: Requester<Api.ActivateAppRequest, Api.ActivateAppResponse>
-    = this._requester('activate_app')
-  attachAppInterface: Requester<Api.AttachAppInterfaceRequest, Api.AttachAppInterfaceResponse>
-    = this._requester('attach_app_interface')
-  deactivateApp: Requester<Api.DeactivateAppRequest, Api.DeactivateAppResponse>
-    = this._requester('deactivate_app')
-  dumpState: Requester<Api.DumpStateRequest, Api.DumpStateResponse>
-    = this._requester('dump_state', dumpStateTransform)
-  generateAgentPubKey: Requester<Api.GenerateAgentPubKeyRequest, Api.GenerateAgentPubKeyResponse>
-    = this._requester('generate_agent_pub_key')
-  installApp: Requester<Api.InstallAppRequest, Api.InstallAppResponse>
-    = this._requester('install_app')
-  listDnas: Requester<Api.ListDnasRequest, Api.ListDnasResponse>
-    = this._requester('list_dnas')
-  listCellIds: Requester<Api.ListCellIdsRequest, Api.ListCellIdsResponse>
-    = this._requester('list_cell_ids')
-  listActiveAppIds: Requester<Api.ListActiveAppIdsRequest, Api.ListActiveAppIdsResponse>
-    = this._requester('list_active_app_ids')
+  activateApp = (req: ActivateAppRequest): Promise<ActivateAppResponse> => {
+    return this._requester<
+      ActivateAppRequest,
+      ActivateAppRequest,
+      ActivateAppResponse,
+      ActivateAppResponse
+    >('activate_app')(req)
+  }
+  attachAppInterface = (
+    req: AttachAppInterfaceRequest
+  ): Promise<AttachAppInterfaceResponse> => {
+    return this._requester<
+      AttachAppInterfaceRequest,
+      AttachAppInterfaceRequest,
+      AttachAppInterfaceResponse,
+      AttachAppInterfaceResponse
+    >('attach_app_interface')(req)
+  }
+  deactivateApp = (
+    req: DeactivateAppRequest
+  ): Promise<DeactivateAppResponse> => {
+    return this._requester<
+      DeactivateAppRequest,
+      DeactivateAppRequest,
+      DeactivateAppResponse,
+      DeactivateAppResponse
+    >('deactivate_app')(req)
+  }
+  dumpState = (req: DumpStateRequest): Promise<DumpStateResponse> => {
+    return this._requester<
+      DumpStateRequest,
+      DumpStateRequest,
+      string,
+      DumpStateResponse
+    >(
+      'dump_state',
+      dumpStateTransform
+    )(req)
+  }
+  generateAgentPubKey = (
+    req: GenerateAgentPubKeyRequest
+  ): Promise<GenerateAgentPubKeyResponse> => {
+    return this._requester<
+      GenerateAgentPubKeyRequest,
+      GenerateAgentPubKeyRequest,
+      GenerateAgentPubKeyResponse,
+      GenerateAgentPubKeyResponse
+    >('generate_agent_pub_key')(req)
+  }
+  installApp = (req: InstallAppRequest): Promise<InstallAppResponse> => {
+    return this._requester<
+      InstallAppRequest,
+      InstallAppRequest,
+      InstallAppResponse,
+      InstallAppResponse
+    >('install_app')(req)
+  }
+  listDnas = (req: ListDnasRequest): Promise<ListDnasResponse> => {
+    return this._requester<
+      ListDnasRequest,
+      ListDnasRequest,
+      ListDnasResponse,
+      ListDnasResponse
+    >('list_dnas')(req)
+  }
+  listCellIds = (req: ListCellIdsRequest): Promise<ListCellIdsResponse> => {
+    return this._requester<
+      ListCellIdsRequest,
+      ListCellIdsRequest,
+      ListCellIdsResponse,
+      ListCellIdsResponse
+    >('list_cell_ids')(req)
+  }
+  listActiveAppIds = (
+    req: ListActiveAppIdsRequest
+  ): Promise<ListActiveAppIdsResponse> => {
+    return this._requester<
+      ListActiveAppIdsRequest,
+      ListActiveAppIdsRequest,
+      ListActiveAppIdsResponse,
+      ListActiveAppIdsResponse
+    >('list_active_app_ids')(req)
+  }
 }
 
-
-const dumpStateTransform: Transformer<Api.DumpStateRequest, Api.DumpStateRequest, string, Api.DumpStateResponse> = {
+const dumpStateTransform: Transformer<
+  DumpStateRequest,
+  DumpStateRequest,
+  string,
+  DumpStateResponse
+> = {
   input: (req) => req,
-  output: (res: string): Api.DumpStateResponse => {
+  output: (res: string): DumpStateResponse => {
     return JSON.parse(res)
-  }
+  },
 }

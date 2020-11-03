@@ -9,10 +9,11 @@ export const requesterTransformer =
     requester: Requester<Tagged<ReqI>, Tagged<ResI>>,
     tag: string,
     transform: Transformer<ReqO, ReqI, ResI, ResO> = identityTransformer
-  ) => (
+  ): Requester<ReqO, ResO> => (
       async (req: ReqO) => {
         const input = { type: tag, data: transform.input(req) }
         const response = await requester(input)
+        // drop the response type/tag
         const output = transform.output(response.data)
         return output
       }
