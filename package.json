@@ -9,10 +9,10 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "build": "rm -rf ./lib ; tsc -d ",
+    "build": "npm run prepare",
     "dev": "rm -rf ./lib ; tsc -d -w",
     "doc": "typedoc",
-    "prepare": "npm run build",
+    "prepare": "rm -rf ./lib ; tsc -d",
     "prepublishOnly": "npm test",
     "test": "npm run test:raw | tap-diff",
     "test:raw": "RUST_LOG=error RUST_BACKTRACE=1 ts-node test",
