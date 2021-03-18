@@ -122,6 +122,26 @@ test('can call a zome function', withConductor(ADMIN_PORT, async t => {
   t.equal(response, "foo")
 }))
 
+test('can call a zome function twice, reusing args', withConductor(ADMIN_PORT, async t => {
+  const [installed_app_id, cell_id, nick, client] = await installAppAndDna(ADMIN_PORT)
+  const info = await client.appInfo({ installed_app_id }, 1000)
+  t.deepEqual(info.cell_data[0][0], cell_id)
+  t.equal(info.cell_data[0][1], nick)
+  const args = {
+    // TODO: write a test with a real capability secret.
+    cap: null,
+    cell_id,
+    zome_name: TEST_ZOME_NAME,
+    fn_name: 'foo',
+    provenance: fakeAgentPubKey('TODO'),
+    payload: null,
+  }
+  const response = await client.callZome(args, 30000)
+  t.equal(response, "foo")
+  const response2 = await client.callZome(args, 30000)
+  t.equal(response, "foo")
+}))
+  
 test('can receive a signal', withConductor(ADMIN_PORT, async t => {
   await new Promise(async (resolve, reject) => {
     try {
