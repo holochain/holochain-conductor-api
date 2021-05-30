@@ -1,4 +1,4 @@
-import * as Websocket from "isomorphic-ws";
+import Websocket from "isomorphic-ws";
 import { encode, decode } from "@msgpack/msgpack";
 import { nanoid } from "nanoid";
 import { AppSignal, AppSignalCb, SignalResponseGeneric } from "../api/app";
@@ -10,7 +10,7 @@ import { AppSignal, AppSignalCb, SignalResponseGeneric } from "../api/app";
  * Uses Holochain's websocket WireMessage for communication.
  */
 export class WsClient {
-  socket: Websocket;
+  socket: any;
   pendingRequests: Record<number, { fulfill: Function; reject: Function }>;
   index: number;
   alreadyWarnedNoSignalCb: boolean;
